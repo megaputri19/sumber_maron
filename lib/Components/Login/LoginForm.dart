@@ -4,6 +4,7 @@ import 'package:sumber_maron/Components/custom_surfix_icon.dart';
 import 'package:sumber_maron/Components/default_button_custome_color.dart';
 import 'package:sumber_maron/Screens/Register/Register.dart';
 import 'package:sumber_maron/homepage.dart';
+import 'package:sumber_maron/http_login.dart';
 import 'package:sumber_maron/size_config.dart';
 import 'package:sumber_maron/utils/constants.dart';
 
@@ -16,6 +17,7 @@ class SignInform extends StatefulWidget {
 }
 
 class _SignInform extends State<SignInform> {
+  HttpLogin dataResponse = HttpLogin();
   final formKey = GlobalKey<FormState>();
   String? email;
   String? password;
@@ -61,6 +63,27 @@ class _SignInform extends State<SignInform> {
           press: () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const homepage()));
+            HttpLogin.loginUser(
+              txtEmail.text,
+              txtPassword.text,
+            ).then((value) {
+              dataResponse = value;
+              // ignore: avoid_print
+              print(dataResponse.textMessage);
+
+              if (dataResponse.textMessage == 'Login berhasil.') {
+                // ignore: avoid_print
+                print(dataResponse.email);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const homepage();
+                    },
+                  ),
+                );
+              }
+            });
           },
         ),
         const SizedBox(

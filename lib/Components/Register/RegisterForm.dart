@@ -1,8 +1,10 @@
 // ignore: file_names
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sumber_maron/Components/custom_surfix_icon.dart';
 import 'package:sumber_maron/Components/default_button_custome_color.dart';
 import 'package:sumber_maron/Screens/Login/LoginScreens.dart';
+import 'package:sumber_maron/http_registrasi.dart';
 import 'package:sumber_maron/size_config.dart';
 import 'package:sumber_maron/utils/constants.dart';
 
@@ -15,6 +17,7 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpForm extends State<SignUpForm> {
+  HttpRegistrasi dataResponse = HttpRegistrasi();
   final formKey = GlobalKey<FormState>();
   String? username;
   String? email;
@@ -74,9 +77,58 @@ class _SignUpForm extends State<SignUpForm> {
           color: kPrimaryColor,
           text: "Daftar",
           press: () {
-            register();
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const LoginScreens()));
+            // register();
+            // Navigator.push(context,
+            //     MaterialPageRoute(builder: (context) => const LoginScreens()));
+            HttpRegistrasi.registrasiUser(
+              txtNama.text,
+              txtEmail.text,
+              txtPassword.text,
+              txtPhone.text,
+              txtUsername.text,
+            ).then((value) {
+              dataResponse = value;
+              print(dataResponse.textMessage);
+
+              if (dataResponse.textMessage == 'Registrasi berhasil.') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const LoginScreens();
+                    },
+                  ),
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return CupertinoAlertDialog(
+                      title: const Text('Registrasi Gagal!'),
+                      content: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(dataResponse.textMessage.toString()),
+                      ),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: const Text(
+                            'Oke',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
+            });
           },
         ),
         const SizedBox(
